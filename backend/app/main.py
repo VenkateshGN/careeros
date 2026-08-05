@@ -1,21 +1,18 @@
 from fastapi import FastAPI
 
+from app.api.routes import users
+
+
 app = FastAPI(
-    title="CareerOS API",
-    version="0.1.0"
+    title="CareerOS API"
 )
+
+
+app.include_router(users.router)
 
 
 @app.get("/")
 def root():
     return {
-        "message": "CareerOS Backend Running",
-        "version": "0.1.0"
-    }
-
-
-@app.get("/health")
-def health_check():
-    return {
-        "status": "healthy"
+        "message": "CareerOS API running"
     }
