@@ -1,0 +1,16 @@
+{
+    "mcpServers": {
+        "cockroachdb-agent-memory": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@cockroachlabs/mcp-server@latest"
+            ],
+            "env": {
+                "COCKROACH_MCP_ENDPOINT": "https://cockroachlabs.cloud/mcp",
+                "COCKROACH_API_KEY": "${COCKROACH_CLOUD_API_KEY}",
+                "MEMORY_CLUSTER_ID": "${COCKROACH_CLUSTER_ID}"
+            }
+        }
+    }
+}

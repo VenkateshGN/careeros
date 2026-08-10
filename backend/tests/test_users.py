@@ -8,8 +8,78 @@ from app.main import app
 client = TestClient(app)
 
 
-def test_create_user():
+def test_create_user_existing_email():
+    email = f"testuser_exist_{uuid.uuid4()}@gmail.com"
+    client.post("/users/", json={"full_name": "Test User", "email": email, "password": "password123"})
 
+    response = client.post("/users/", json={"full_name": "Test User 2", "email": email, "password": "password123"})
+    assert response.status_code == 400
+    assert "email already registered" in response.json().get("detail", "").lower() or response.status_code == 400
+
+def test_create_user_validation():
+    # Empty full_name
+    response = client.post("/users/", json={"full_name": "", "email": "valid@email.com", "password": "password123"})
+    assert response.status_code == 422
+
+    # Empty email
+    response = client.post("/users/", json={"full_name": "Name", "email": "", "password": "password123"})
+    assert response.status_code == 422
+
+    # Invalid email format
+    response = client.post("/users/", json={"full_name": "Name", "email": "not-an-email", "password": "password123"})
+    assert response.status_code == 422
+
+    # Weak password
+    response = client.post("/users/", json={"full_name": "Name", "email": "valid2@email.com", "password": "weak"})
+    assert response.status_code == 422
+
+    # Missing password
+    response = client.post("/users/", json={"full_name": "Name", "email": "valid3@email.com"})
+    assert response.status_code == 422
+
+    # Missing request body
+    response = client.post("/users/")
+    assert response.status_code == 422
+
+def test_login_validation():
+    email = f"testuser_{uuid.uuid4()}@gmail.com"
+    password = "password123"
+    client.post("/users/", json={"full_name": "Name", "email": email, "password": password})
+
+    # Wrong password
+    response = client.post("/auth/login", json={"email": email, "password": "wrongpassword"})
+    assert response.status_code == 401
+
+    # Wrong email
+    response = client.post("/auth/login", json={"email": "wrong@email.com", "password": password})
+    assert response.status_code == 401
+
+    # Empty email
+    response = client.post("/auth/login", json={"email": "", "password": password})
+    assert response.status_code == 422
+
+    # Empty password
+    response = client.post("/auth/login", json={"email": email, "password": ""})
+    assert response.status_code == 422
+
+    # Missing body
+    response = client.post("/auth/login")
+    assert response.status_code == 422
+
+def test_jwt_authentication():
+    # Invalid token
+    response = client.get("/users/me", headers={"Authorization": "Bearer invalidtoken"})
+    assert response.status_code == 401
+
+    # No Auth header
+    response = client.get("/users/me")
+    assert response.status_code == 401
+
+    # Wrong Bearer format
+    response = client.get("/users/me", headers={"Authorization": "Invalidformat"})
+    assert response.status_code == 401
+
+def test_create_user():
     email = f"testuser_{uuid.uuid4()}@gmail.com"
 
     response = client.post(
@@ -114,7 +184,7 @@ def test_change_password():
     # Old login should fail
     login_old = client.post("/auth/login", json={"email": email, "password": password})
     assert login_old.status_code == 401
-    
+
     # New login should succeed
     login_new = client.post("/auth/login", json={"email": email, "password": new_password})
     assert login_new.status_code == 200

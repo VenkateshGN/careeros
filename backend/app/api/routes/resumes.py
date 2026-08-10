@@ -19,37 +19,61 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 @router.post("/upload")
-def upload_resume(
+async def upload_resume(
     resume: UploadFile = File(...),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    ALLOWED_EXTENSIONS = {"pdf", "docx", "txt", "doc"}
+    file_extension = resume.filename.split(".")[-1].lower() if resume.filename else "pdf"
+
+    if file_extension not in ALLOWED_EXTENSIONS:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Invalid file format. Only PDF, DOCX, and TXT are allowed.")
+
+    file_bytes = await resume.read()
+
+    # Check max size (10MB)
+    if len(file_bytes) == 0:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Empty file not allowed")
+    if len(file_bytes) > 10 * 1024 * 1024:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="File size exceeds 10MB limit")
+
     # Generate unique filename
     file_extension = resume.filename.split(".")[-1] if resume.filename else "pdf"
     unique_filename = f"{current_user.id}_{uuid.uuid4().hex[:8]}.{file_extension}"
     file_path = os.path.join(UPLOAD_DIR, unique_filename)
-    
+
     # Save file
-    file_bytes = resume.file.read()
     with open(file_path, "wb") as buffer:
         buffer.write(file_bytes)
-        
+
     resume_url = f"/{file_path}"
-    
+
     # Update user DB record
     current_user.resume_url = resume_url
     db.commit()
     db.refresh(current_user)
-    
+
     # Parse PDF Text
     parsed_text = extract_text_from_pdf(file_bytes)
-    
+
     # Process through an AI logic model to get structured data
     from app.services.ai_service import extract_structured_resume_data
     structured_data = extract_structured_resume_data(parsed_text)
-    
+
+    # Save parsed skills to user profile
+    if structured_data and "skills" in structured_data:
+        extracted_skills = structured_data["skills"]
+        if isinstance(extracted_skills, list) and len(extracted_skills) > 0:
+            current_user.skills = ", ".join(extracted_skills)
+            db.commit()
+            db.refresh(current_user)
+
     return {
-        "resume_url": current_user.resume_url, 
+        "resume_url": current_user.resume_url,
         "message": "Resume uploaded successfully",
         "parsed_content_length": len(parsed_text),
         "structured_data": structured_data
@@ -63,11 +87,11 @@ def delete_resume(
     if not current_user.resume_url:
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="No resume uploaded")
-        
+
     file_path = current_user.resume_url.lstrip("/")
     if os.path.exists(file_path):
         os.remove(file_path)
-        
+
     current_user.resume_url = None
     db.commit()
     db.refresh(current_user)
@@ -80,11 +104,11 @@ def download_resume(
     if not current_user.resume_url:
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="No resume uploaded")
-        
+
     from fastapi.responses import FileResponse
     file_path = current_user.resume_url.lstrip("/")
     if not os.path.exists(file_path):
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Resume file not found")
-        
+
     return FileResponse(path=file_path, filename="resume.pdf", media_type="application/pdf")

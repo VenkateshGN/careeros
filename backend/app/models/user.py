@@ -30,6 +30,7 @@ class User(Base):
     skills = Column(String(500), nullable=True)
     is_verified = Column(Boolean, default=False, nullable=False)
     role = Column(String(50), default="candidate", nullable=False)
+    organization_id = Column(String(100), nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 

@@ -27,3 +27,17 @@ class Job(Base):
         onupdate=datetime.utcnow,
         nullable=False,
     )
+
+    company = relationship("Company", lazy="joined")
+
+    @property
+    def company_name(self):
+        return self.company.name if self.company else "CareerOS Partner"
+
+    @property
+    def company_logo(self):
+        return self.company.logo_url if self.company else None
+
+    @property
+    def company_website(self):
+        return self.company.website if self.company else None

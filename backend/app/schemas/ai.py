@@ -1,6 +1,16 @@
 from typing import List, Optional
 from pydantic import BaseModel
 
+class JobMatchingRequest(BaseModel):
+    resume_text: str
+    job_description: str
+
+class JobMatchingResponse(BaseModel):
+    match_score: int
+    matched_skills: List[str]
+    missing_skills: List[str]
+    recommendation: str
+
 class ResumeReviewRequest(BaseModel):
     resume_url: str
 
@@ -24,7 +34,7 @@ class CareerRoadmapResponse(BaseModel):
     target_role: str
     steps: List[RoadmapStep]
 
-class InterviewQuestionsRequest(BaseModel):
+class MockInterviewRequest(BaseModel):
     job_title: str
     experience_level: Optional[str] = "Mid level"
 
@@ -34,6 +44,7 @@ class MockInterviewQuestion(BaseModel):
     hint: str
 
 class MockInterviewResponse(BaseModel):
+    job_title: str
     questions: List[MockInterviewQuestion]
 
 class ResumeSuggestionRequest(BaseModel):

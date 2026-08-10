@@ -26,7 +26,8 @@ def create_user(db, user_data):
     user = User(
         full_name=user_data.full_name,
         email=user_data.email,
-        password_hash=hashed_password
+        password_hash=hashed_password,
+        role=getattr(user_data, "role", "candidate")
     )
 
 

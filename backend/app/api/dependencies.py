@@ -32,25 +32,20 @@ def get_current_user(
                 status_code=401,
                 detail="Invalid token"
             )
-
-
-        user = db.query(User).filter(
-            User.id == user_id
-        ).first()
-
-
-        if user is None:
-            raise HTTPException(
-                status_code=404,
-                detail="User not found"
-            )
-
-
-        return user
-
-
     except Exception:
         raise HTTPException(
             status_code=401,
             detail="Invalid token"
         )
+
+    user = db.query(User).filter(
+        User.id == user_id
+    ).first()
+
+    if user is None:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    return user

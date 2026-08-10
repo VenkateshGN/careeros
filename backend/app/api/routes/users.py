@@ -53,7 +53,7 @@ def update_current_user_data(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    update_data = user_data.model_dump(exclude_unset=True)
+    update_data = user_data.model_dump(exclude_unset=True, mode='json')
     return update_user_profile(db, current_user, update_data)
 
 
