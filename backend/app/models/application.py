@@ -2,18 +2,17 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, String, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from app.core.database import Base
+from app.core.database import Base, GUID
 
 
 class Application(Base):
     __tablename__ = "applications"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    job_id = Column(UUID(as_uuid=True), ForeignKey("jobs.id"), nullable=False)
+    id = Column(GUID, primary_key=True, default=uuid.uuid4)
+    user_id = Column(GUID, ForeignKey("users.id"), nullable=False)
+    job_id = Column(GUID, ForeignKey("jobs.id"), nullable=False)
     resume_url = Column(String(500), nullable=True)
     status = Column(String(50), default="Applied", nullable=False)
 

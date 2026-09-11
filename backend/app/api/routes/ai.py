@@ -295,19 +295,32 @@ Profile Verified:
             # CockroachDB vector similarity search
             # ------------------------------------------------
 
-            memories = (
-                db.query(AgentMemory)
-                .filter(
-                    AgentMemory.user_id == current_user.id
-                )
-                .order_by(
-                    AgentMemory.embedding.l2_distance(
-                        query_vector
+            if db.bind.dialect.name in ('postgresql', 'cockroachdb'):
+                memories = (
+                    db.query(AgentMemory)
+                    .filter(
+                        AgentMemory.user_id == current_user.id
                     )
+                    .order_by(
+                        AgentMemory.embedding.l2_distance(
+                            query_vector
+                        )
+                    )
+                    .limit(4)
+                    .all()
                 )
-                .limit(4)
-                .all()
-            )
+            else:
+                memories = (
+                    db.query(AgentMemory)
+                    .filter(
+                        AgentMemory.user_id == current_user.id
+                    )
+                    .order_by(
+                        AgentMemory.created_at.desc()
+                    )
+                    .limit(4)
+                    .all()
+                )
 
             logger.info(
                 "VECTOR SEARCH SUCCESS | "

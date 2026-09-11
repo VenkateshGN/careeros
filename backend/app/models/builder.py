@@ -1,19 +1,17 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, String, Text
-from sqlalchemy.dialects.postgresql import UUID, JSONB
-from sqlalchemy import ForeignKey
+from sqlalchemy import Column, DateTime, String, Text, JSON, ForeignKey
 from sqlalchemy.orm import relationship
 
-from app.core.database import Base
+from app.core.database import Base, GUID
 
 
 class BuiltResume(Base):
     __tablename__ = "built_resumes"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    id = Column(GUID, primary_key=True, default=uuid.uuid4)
+    user_id = Column(GUID, ForeignKey("users.id"), nullable=False)
     template_id = Column(String(50), default="default", nullable=False)
     
     # Store dynamic sections as a serialized JSON string representing the resume

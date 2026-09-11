@@ -1,7 +1,9 @@
 import os
+import uuid
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
+from sqlalchemy.types import TypeDecorator, CHAR
 from sqlalchemy.orm import declarative_base, sessionmaker
 from pathlib import Path
 
@@ -9,16 +11,26 @@ env_path = Path(__file__).resolve().parents[2] / ".env"
 load_dotenv(dotenv_path=env_path)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-  # Temporary debugging
 
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL environment variable is not set.")
 
+if DATABASE_URL.startswith("sqlite:///./"):
+    db_file = DATABASE_URL.replace("sqlite:///./", "")
+    abs_db_path = (Path(__file__).resolve().parents[2] / db_file).as_posix()
+    DATABASE_URL = f"sqlite:///{abs_db_path}"
+
+connect_args = {}
+if DATABASE_URL.startswith("sqlite:"):
+    connect_args["check_same_thread"] = False
+
 engine = create_engine(
     DATABASE_URL,
+    connect_args=connect_args,
     pool_pre_ping=True,
     pool_recycle=300
 )
+
 
 SessionLocal = sessionmaker(
     autocommit=False,
@@ -29,9 +41,47 @@ SessionLocal = sessionmaker(
 Base = declarative_base()
 
 
+class GUID(TypeDecorator):
+    """Platform-independent GUID type.
+    Uses PostgreSQL/CockroachDB UUID type, otherwise uses CHAR(36), handling string and UUID object conversions seamlessly.
+    """
+    impl = CHAR
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name in ('postgresql', 'cockroachdb'):
+            try:
+                from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+                return dialect.type_descriptor(PG_UUID(as_uuid=True))
+            except ImportError:
+                return dialect.type_descriptor(CHAR(36))
+        else:
+            return dialect.type_descriptor(CHAR(36))
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return value
+        if isinstance(value, uuid.UUID):
+            return str(value)
+        try:
+            return str(uuid.UUID(str(value)))
+        except (ValueError, TypeError):
+            return str(value)
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return value
+        if isinstance(value, uuid.UUID):
+            return value
+        try:
+            return uuid.UUID(str(value))
+        except (ValueError, TypeError):
+            return value
+
+
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
-        db.close()
+        db.close()

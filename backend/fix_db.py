@@ -9,6 +9,7 @@ from app.models.application import Application
 from app.models.company import Company
 from app.models.builder import BuiltResume
 from app.models.password_reset import PasswordReset
+from app.models.agent_memory import AgentMemory
 
 load_dotenv()
 engine = create_engine(os.getenv('DATABASE_URL'))
