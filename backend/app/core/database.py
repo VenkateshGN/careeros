@@ -16,7 +16,9 @@ if not DATABASE_URL:
     DATABASE_URL = "sqlite:////tmp/careeros.db"
 
 if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+pg8000://", 1)
+elif DATABASE_URL.startswith("postgresql://") and "+pg8000" not in DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+pg8000://", 1)
 
 if DATABASE_URL.startswith("sqlite:///./"):
     db_file = DATABASE_URL.replace("sqlite:///./", "")
