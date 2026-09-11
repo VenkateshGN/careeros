@@ -7,8 +7,7 @@ import logging
 logger = logging.getLogger("careeros.email")
 
 def send_password_reset_email(to_email: str, token: str) -> bool:
-    # The frontend URL for password reset
-    frontend_url = os.getenv("FRONTEND_URL", "https://careeros-ivory-zeta.vercel.app")
+    frontend_url = os.getenv("FRONTEND_URL", "https://careeros-psi-seven.vercel.app").rstrip("/")
     reset_link = f"{frontend_url}/reset-password?token={token}&email={to_email}"
 
     logger.info(f"=== PASSWORD RESET LINK GENERATED FOR {to_email} ===")
