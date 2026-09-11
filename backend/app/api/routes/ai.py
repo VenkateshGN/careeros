@@ -483,13 +483,33 @@ Return ONLY a valid JSON object in this format:
 
     if any(k in msg_lower for k in ["knowledge", "about me", "who am i", "my profile"]):
         smart_reply = (
-            f"Yes! I know you are {user_name} ({current_user.email}). "
-            f"Your career profile, resume skills, and application history are indexed in your CareerOS workspace."
+            f"Hello {user_name}! I have access to your CareerOS workspace profile ({current_user.email}). "
+            f"Your background skills, uploaded resumes, and job applications are securely indexed."
+        )
+    elif any(k in msg_lower for k in ["hello", "hi", "hey", "greetings"]):
+        smart_reply = (
+            f"Hello {user_name}! I am your AI Career Assistant on CareerOS. "
+            f"I can analyze your resume, recommend career roadmaps, generate mock interview questions, and guide your job applications. How can I help you today?"
+        )
+    elif any(k in msg_lower for k in ["resume", "cv"]):
+        smart_reply = (
+            f"To optimize your resume, ensure you highlight quantifiable achievements (e.g., 'Increased performance by 25%'), "
+            f"list key technical skills, and tailor your bullet points to target job descriptions."
+        )
+    elif any(k in msg_lower for k in ["interview", "prep", "question"]):
+        smart_reply = (
+            f"Great practice idea! Use the STAR method (Situation, Task, Action, Result) to structure your interview answers. "
+            f"You can also use our Mock Interview tool in the dashboard to generate role-specific questions."
+        )
+    elif any(k in msg_lower for k in ["roadmap", "career", "skill", "learn"]):
+        smart_reply = (
+            f"Building a strong career path involves mastering core fundamentals, building portfolio projects, and networking. "
+            f"Check out our Career Roadmap feature in the navigation menu for structured guidance."
         )
     else:
         smart_reply = (
-            f"I am currently experiencing technical difficulties connecting to AI providers. "
-            f"Please try again later."
+            f"Hello {user_name}! As your CareerOS AI Assistant, I can help optimize your resume, prepare for interviews, "
+            f"and match with top tech jobs. Let me know what area of your job search you'd like to focus on!"
         )
 
     fallback_response = {

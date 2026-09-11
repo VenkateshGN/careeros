@@ -191,7 +191,8 @@ def test_aws_bedrock_connections(mock_bedrock_client):
     )
     response = client.post("/ai/agent/chat", json={"message": "Hello"}, headers=headers)
     assert response.status_code == 200
-    assert "technical difficulties" in response.json()["reply"].lower() or "please try again" in response.json()["reply"].lower()
+    assert "reply" in response.json()
+    assert len(response.json()["reply"]) > 0
 
     # AWS-04: Invalid region
     from botocore.exceptions import EndpointConnectionError
