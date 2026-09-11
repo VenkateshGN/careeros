@@ -2,13 +2,19 @@ import pytest
 import uuid
 from fastapi.testclient import TestClient
 from app.main import app
-from app.core.database import SessionLocal
+from app.core.database import SessionLocal, engine, Base
 from app.models.user import User
 from app.models.agent_memory import AgentMemory
 
+@pytest.fixture(scope="session", autouse=True)
+def setup_database():
+    Base.metadata.create_all(bind=engine)
+    yield
+
 @pytest.fixture(scope="session")
 def client():
-    return TestClient(app)
+    with TestClient(app) as c:
+        yield c
 
 @pytest.fixture
 def db_session():
