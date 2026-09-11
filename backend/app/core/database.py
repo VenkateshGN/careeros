@@ -11,10 +11,25 @@ from pathlib import Path
 env_path = Path(__file__).resolve().parents[2] / ".env"
 load_dotenv(dotenv_path=env_path)
 
+import urllib.parse
+
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL or "[YOUR" in DATABASE_URL or "YOUR-PASSWORD" in DATABASE_URL or "YOUR_PASSWORD" in DATABASE_URL:
     DATABASE_URL = "sqlite:////tmp/careeros.db"
+else:
+    try:
+        if "://" in DATABASE_URL and not DATABASE_URL.startswith("sqlite"):
+            scheme, rest = DATABASE_URL.split("://", 1)
+            if "@" in rest:
+                auth_part, host_part = rest.rsplit("@", 1)
+                if ":" in auth_part:
+                    user, password = auth_part.split(":", 1)
+                    encoded_password = urllib.parse.quote(urllib.parse.unquote(password), safe="")
+                    rest = f"{user}:{encoded_password}@{host_part}"
+            DATABASE_URL = f"{scheme}://{rest}"
+    except Exception:
+        pass
 
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+pg8000://", 1)
