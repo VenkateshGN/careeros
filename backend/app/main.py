@@ -85,8 +85,9 @@ logger = logging.getLogger("careeros.main")
 @app.on_event("startup")
 def sync_db():
     try:
+        from app.core.database import engine, Base
+        Base.metadata.create_all(bind=engine)
         from sqlalchemy import text
-        from app.core.database import engine
         with engine.begin() as conn:
             try:
                 conn.execute(text("ALTER TABLE users ADD COLUMN role VARCHAR(50) DEFAULT 'candidate' NOT NULL;"))
@@ -97,7 +98,7 @@ def sync_db():
             except Exception:
                 pass
     except Exception as e:
-        pass
+        logger.error(f"DB startup sync issue: {e}")
 
 @app.get("/")
 def root():
