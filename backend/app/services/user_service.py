@@ -23,7 +23,9 @@ def create_user(db, user_data):
     )
 
 
+    import uuid
     user = User(
+        id=uuid.uuid4(),
         full_name=user_data.full_name,
         email=user_data.email,
         password_hash=hashed_password,

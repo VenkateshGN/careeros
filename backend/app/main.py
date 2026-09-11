@@ -27,6 +27,7 @@ app = FastAPI(
     title="CareerOS API",
     description="The core backend API serving the AI-Driven CareerOS Platform. Features AI Interview Mocking, Resume Builders, and analytics tracking.",
     version="1.0.0",
+    redirect_slashes=False,
     terms_of_service="http://careeros.com/terms/",
     contact={
         "name": "CareerOS Support",
