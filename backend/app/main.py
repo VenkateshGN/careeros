@@ -10,11 +10,19 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-# from prometheus_fastapi_instrumentator import Instrumentator # Install in production
 
-limiter = Limiter(key_func=get_remote_address)
+def get_remote_address_safe(request: Request) -> str:
+    if not request:
+        return "127.0.0.1"
+    x_forwarded_for = request.headers.get("x-forwarded-for")
+    if x_forwarded_for:
+        return x_forwarded_for.split(",")[0].strip()
+    if getattr(request, "client", None) and request.client.host:
+        return request.client.host
+    return "127.0.0.1"
+
+limiter = Limiter(key_func=get_remote_address_safe)
 
 from app.api.routes import users
 from app.api.routes import auth
