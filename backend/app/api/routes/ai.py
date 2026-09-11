@@ -481,10 +481,20 @@ Return ONLY a valid JSON object in this format:
     user_name = getattr(current_user, "full_name", None) or "Candidate"
     msg_lower = request.message.lower()
 
-    if any(k in msg_lower for k in ["knowledge", "about me", "who am i", "my profile"]):
+    user_skills = getattr(current_user, "skills", None)
+    if user_skills:
+        skills_info = f"Your profile lists the following skills: {user_skills}."
+    else:
+        skills_info = "You haven't listed any skills in your profile yet. You can add them in Profile Settings or upload a resume to extract them automatically!"
+
+    if any(k in msg_lower for k in ["skill", "skills"]):
+        smart_reply = (
+            f"Hello {user_name}! {skills_info}"
+        )
+    elif any(k in msg_lower for k in ["knowledge", "about me", "who am i", "my profile"]):
         smart_reply = (
             f"Hello {user_name}! I have access to your CareerOS workspace profile ({current_user.email}). "
-            f"Your background skills, uploaded resumes, and job applications are securely indexed."
+            f"{skills_info}"
         )
     elif any(k in msg_lower for k in ["hello", "hi", "hey", "greetings"]):
         smart_reply = (
@@ -501,7 +511,7 @@ Return ONLY a valid JSON object in this format:
             f"Great practice idea! Use the STAR method (Situation, Task, Action, Result) to structure your interview answers. "
             f"You can also use our Mock Interview tool in the dashboard to generate role-specific questions."
         )
-    elif any(k in msg_lower for k in ["roadmap", "career", "skill", "learn"]):
+    elif any(k in msg_lower for k in ["roadmap", "career", "learn"]):
         smart_reply = (
             f"Building a strong career path involves mastering core fundamentals, building portfolio projects, and networking. "
             f"Check out our Career Roadmap feature in the navigation menu for structured guidance."
