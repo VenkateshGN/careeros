@@ -89,8 +89,21 @@ class GUID(TypeDecorator):
 
 
 def get_db():
-    db = SessionLocal()
     try:
+        db = SessionLocal()
+        # Ping connection to verify credentials
+        from sqlalchemy import text
+        db.execute(text("SELECT 1"))
+        yield db
+    except Exception as e:
+        logging.getLogger("careeros.db").error(f"Database connection failure ({e}). Falling back to local SQLite.")
+        sqlite_engine = create_engine("sqlite:////tmp/careeros.db", connect_args={"check_same_thread": False})
+        Base.metadata.create_all(bind=sqlite_engine)
+        FallbackSession = sessionmaker(autocommit=False, autoflush=False, bind=sqlite_engine)
+        db = FallbackSession()
         yield db
     finally:
-        db.close()
+        try:
+            db.close()
+        except Exception:
+            pass
