@@ -81,11 +81,11 @@ def _call_bedrock_json(prompt: str, fallback_mock: dict) -> dict:
     # ========================================================
 
     if gemini_client:
-        logger.info("Calling Gemini model (gemini-3.5-flash)...")
+        logger.info("Calling Gemini model (gemini-1.5-flash)...")
 
         try:
             response = gemini_client.models.generate_content(
-                model="gemini-3.5-flash",
+                model="gemini-1.5-flash",
                 contents=prompt,
                 config={
                     "response_mime_type": "application/json"

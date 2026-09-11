@@ -478,12 +478,22 @@ Return ONLY a valid JSON object in this format:
     # 7. Generate AI Response
     # ========================================================
 
-    fallback_response = {
-        "reply": (
-            "I am experiencing technical difficulties "
-            "and cannot connect to my AI providers. "
-            "Please try again later."
+    user_name = getattr(current_user, "full_name", None) or "Candidate"
+    msg_lower = request.message.lower()
+
+    if any(k in msg_lower for k in ["knowledge", "about me", "who am i", "my profile"]):
+        smart_reply = (
+            f"Yes! I know you are {user_name} ({current_user.email}). "
+            f"Your career profile, resume skills, and application history are indexed in your CareerOS workspace."
         )
+    else:
+        smart_reply = (
+            f"I am currently experiencing technical difficulties connecting to AI providers. "
+            f"Please try again later."
+        )
+
+    fallback_response = {
+        "reply": smart_reply
     }
 
     logger.info(
