@@ -32,9 +32,9 @@ else:
         pass
 
 if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+pg8000://", 1)
-elif DATABASE_URL.startswith("postgresql://") and "+pg8000" not in DATABASE_URL:
-    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+pg8000://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg2://", 1)
+elif DATABASE_URL.startswith("postgresql://") and "+psycopg2" not in DATABASE_URL and "+pg8000" not in DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
 
 if DATABASE_URL.startswith("sqlite:///./"):
     db_file = DATABASE_URL.replace("sqlite:///./", "")
@@ -44,6 +44,8 @@ if DATABASE_URL.startswith("sqlite:///./"):
 connect_args = {}
 if DATABASE_URL.startswith("sqlite"):
     connect_args["check_same_thread"] = False
+elif "postgresql" in DATABASE_URL or "postgres" in DATABASE_URL:
+    connect_args["sslmode"] = "prefer"
 
 try:
     engine = create_engine(
