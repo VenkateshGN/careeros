@@ -30,7 +30,17 @@ def register_user(
     user: UserCreate,
     db: Session = Depends(get_db)
 ):
-    return create_user(db, user)
+    try:
+        return create_user(db, user)
+    except HTTPException:
+        raise
+    except Exception as e:
+        import logging
+        logging.getLogger("careeros.users").error(f"User registration error: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=400,
+            detail=f"Registration error: {str(e)}"
+        )
 
 
 
