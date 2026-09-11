@@ -66,31 +66,32 @@ def forgot_password(
     data: ForgotPasswordRequest,
     db: Session = Depends(get_db)
 ):
-    # Find user by email
-    user = db.query(User).filter(User.email == data.email).first()
-    if not user:
-        # Avoid user enumeration by returning 200 OK anyway
+    try:
+        user = db.query(User).filter(User.email == data.email).first()
+        if not user:
+            return {"message": "If the email is registered, a password reset link has been sent."}
+
+        token = secrets.token_urlsafe(32)
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+
+        expires_at = datetime.utcnow() + timedelta(hours=1)
+        reset_entry = PasswordReset(
+            id=uuid.uuid4(),
+            user_id=user.id,
+            token_hash=token_hash,
+            expires_at=expires_at,
+            used=False
+        )
+        db.add(reset_entry)
+        db.commit()
+
+        send_password_reset_email(user.email, token)
+
         return {"message": "If the email is registered, a password reset link has been sent."}
-
-    # Generate cryptographically secure token
-    token = secrets.token_urlsafe(32)
-    token_hash = hashlib.sha256(token.encode()).hexdigest()
-
-    # Store token hash with 1 hour expiration
-    expires_at = datetime.utcnow() + timedelta(hours=1)
-    reset_entry = PasswordReset(
-        user_id=user.id,
-        token_hash=token_hash,
-        expires_at=expires_at,
-        used=False
-    )
-    db.add(reset_entry)
-    db.commit()
-
-    # Send reset link (printed to console if SMTP is not configured)
-    send_password_reset_email(user.email, token)
-
-    return {"message": "If the email is registered, a password reset link has been sent."}
+    except Exception as e:
+        import logging
+        logging.getLogger("careeros.auth").error(f"Forgot password error: {e}", exc_info=True)
+        return {"message": "If the email is registered, a password reset link has been sent."}
 
 @router.post("/reset-password")
 def reset_password(
