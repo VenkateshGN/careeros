@@ -22,5 +22,5 @@ COPY ./gunicorn_conf.py .
 # Expose standard FastAPI port
 EXPOSE 8000
 
-# Run Uvicorn via Gunicorn when container launches
-CMD ["gunicorn", "-c", "gunicorn_conf.py", "app.main:app"]
+# Run FastAPI directly via Uvicorn listening on environment PORT
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
