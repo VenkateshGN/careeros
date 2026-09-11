@@ -41,11 +41,14 @@ if DATABASE_URL.startswith("sqlite:///./"):
     abs_db_path = (Path(__file__).resolve().parents[2] / db_file).as_posix()
     DATABASE_URL = f"sqlite:///{abs_db_path}"
 
+if "postgresql" in DATABASE_URL or "postgres" in DATABASE_URL:
+    if "sslmode=" not in DATABASE_URL:
+        sep = "&" if "?" in DATABASE_URL else "?"
+        DATABASE_URL = f"{DATABASE_URL}{sep}sslmode=require"
+
 connect_args = {}
 if DATABASE_URL.startswith("sqlite"):
     connect_args["check_same_thread"] = False
-elif "postgresql" in DATABASE_URL or "postgres" in DATABASE_URL:
-    connect_args["sslmode"] = "prefer"
 
 try:
     engine = create_engine(
