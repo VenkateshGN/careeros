@@ -37,7 +37,9 @@ def apply_for_job(
     if not current_user.resume_url:
         raise HTTPException(status_code=400, detail="Please upload a resume first before applying for jobs")
 
+    import uuid
     application = Application(
+        id=uuid.uuid4(),
         user_id=current_user.id,
         job_id=job_id,
         resume_url=current_user.resume_url,

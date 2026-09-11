@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Form
 from sqlalchemy.orm import Session
+import uuid
 import secrets
 import hashlib
 from datetime import datetime, timedelta
