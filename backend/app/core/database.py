@@ -13,7 +13,7 @@ load_dotenv(dotenv_path=env_path)
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL environment variable is not set.")
+    DATABASE_URL = "sqlite:////tmp/careeros.db"
 
 if DATABASE_URL.startswith("sqlite:///./"):
     db_file = DATABASE_URL.replace("sqlite:///./", "")
