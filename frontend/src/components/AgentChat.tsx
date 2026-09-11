@@ -20,9 +20,12 @@ const AgentChat = () => {
                 message: userText
             });
             setMessages(prev => [...prev, { role: 'agent', text: data.reply }]);
-        } catch (error) {
+        } catch (error: any) {
             console.error("AI Chat connection error:", error);
-            setMessages(prev => [...prev, { role: 'agent', text: "Error: Could not connect to AI Agent Memory." }]);
+            const errText = error?.response?.status === 401
+                ? "Please log in to chat with your AI Career Assistant."
+                : "Error: Could not connect to AI Agent Memory.";
+            setMessages(prev => [...prev, { role: 'agent', text: errText }]);
         } finally {
             setLoading(false);
         }
