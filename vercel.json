@@ -18,6 +18,13 @@
       }
     },
     {
+      "source": "/(users|auth|resumes|jobs|applications|ai|admin|dashboard|companies|health)(/.*)?",
+      "destination": {
+        "type": "service",
+        "service": "backend"
+      }
+    },
+    {
       "source": "/(.*)",
       "destination": {
         "type": "service",
