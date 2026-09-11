@@ -96,18 +96,15 @@ def sync_db():
     try:
         from app.core.database import engine, Base
         Base.metadata.create_all(bind=engine)
-        from sqlalchemy import text
-        with engine.begin() as conn:
-            try:
-                conn.execute(text("ALTER TABLE users ADD COLUMN role VARCHAR(50) DEFAULT 'candidate' NOT NULL;"))
-            except Exception:
-                pass
-            try:
-                conn.execute(text("ALTER TABLE users ADD COLUMN organization_id VARCHAR(100);"))
-            except Exception:
-                pass
     except Exception as e:
-        logger.error(f"DB startup sync issue: {e}")
+        logger.error(f"PostgreSQL startup error ({e}). Creating tables in fallback SQLite.")
+        try:
+            from app.core.database import Base
+            from sqlalchemy import create_engine
+            fallback_engine = create_engine("sqlite:////tmp/careeros.db", connect_args={"check_same_thread": False})
+            Base.metadata.create_all(bind=fallback_engine)
+        except Exception:
+            pass
 
 @app.get("/")
 def root():

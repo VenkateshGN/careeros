@@ -12,7 +12,7 @@ load_dotenv(dotenv_path=env_path)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-if not DATABASE_URL:
+if not DATABASE_URL or "[YOUR" in DATABASE_URL or "YOUR-PASSWORD" in DATABASE_URL or "YOUR_PASSWORD" in DATABASE_URL:
     DATABASE_URL = "sqlite:////tmp/careeros.db"
 
 if DATABASE_URL.startswith("postgres://"):
