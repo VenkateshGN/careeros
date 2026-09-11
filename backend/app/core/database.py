@@ -15,21 +15,30 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     DATABASE_URL = "sqlite:////tmp/careeros.db"
 
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
 if DATABASE_URL.startswith("sqlite:///./"):
     db_file = DATABASE_URL.replace("sqlite:///./", "")
     abs_db_path = (Path(__file__).resolve().parents[2] / db_file).as_posix()
     DATABASE_URL = f"sqlite:///{abs_db_path}"
 
 connect_args = {}
-if DATABASE_URL.startswith("sqlite:"):
+if DATABASE_URL.startswith("sqlite"):
     connect_args["check_same_thread"] = False
 
-engine = create_engine(
-    DATABASE_URL,
-    connect_args=connect_args,
-    pool_pre_ping=True,
-    pool_recycle=300
-)
+try:
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args=connect_args,
+        pool_pre_ping=True,
+        pool_recycle=300
+    )
+except Exception:
+    engine = create_engine(
+        "sqlite:////tmp/careeros.db",
+        connect_args={"check_same_thread": False}
+    )
 
 
 SessionLocal = sessionmaker(
