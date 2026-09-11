@@ -24,7 +24,6 @@ const Login = () => {
             formData.append('password', password);
 
             const res = await api.post('/auth/login', formData, {
-                baseURL: 'http://localhost:8000',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
             });
 
@@ -33,7 +32,6 @@ const Login = () => {
 
             // Now fetch the user identity
             const userRes = await api.get('/users/me', {
-                baseURL: 'http://localhost:8000',
                 headers: { Authorization: `Bearer ${token}` }
             });
 

@@ -24,8 +24,6 @@ const Register = () => {
                 full_name: name,
                 email: email,
                 password: password
-            }, {
-                baseURL: 'http://localhost:8000'
             });
 
             // After successful registration, log them in mechanically via JWT
@@ -34,7 +32,6 @@ const Register = () => {
             formData.append('password', password);
 
             const res = await api.post('/auth/login', formData, {
-                baseURL: 'http://localhost:8000',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
             });
 
@@ -42,7 +39,6 @@ const Register = () => {
             localStorage.setItem('token', token);
 
             const userRes = await api.get('/users/me', {
-                baseURL: 'http://localhost:8000',
                 headers: { Authorization: `Bearer ${token}` }
             });
 

@@ -14,9 +14,7 @@ const ForgotPassword = () => {
         setLoading(true);
         setError('');
         try {
-            await api.post('/auth/forgot-password', { email }, {
-                baseURL: 'http://localhost:8000'
-            });
+            await api.post('/auth/forgot-password', { email });
             setSubmitted(true);
         } catch (err: any) {
             setError(err.response?.data?.detail || "Something went wrong. Please check your network and try again.");

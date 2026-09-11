@@ -34,8 +34,6 @@ const ResetPassword = () => {
                 email,
                 token,
                 new_password: password
-            }, {
-                baseURL: 'http://localhost:8000'
             });
             setSubmitted(true);
         } catch (err: any) {

@@ -34,9 +34,7 @@ const Jobs = () => {
             const limit = 10;
             const skip = page * limit;
             const url = tab === 'recommended' ? '/jobs/suggestions' : `/jobs/?skip=${skip}&limit=${limit}`;
-            const res = await api.get(url, {
-                baseURL: 'http://localhost:8000'
-            });
+            const res = await api.get(url);
             setJobs(res.data);
         } catch (error) {
             console.error("Failed to fetch jobs natively, reverting to empty state", error);
@@ -57,9 +55,7 @@ const Jobs = () => {
         setSelectedJob(job);
         setFetchingDetails(true);
         try {
-            const res = await api.get(`/jobs/${job.id}`, {
-                baseURL: 'http://localhost:8000'
-            });
+            const res = await api.get(`/jobs/${job.id}`);
             setSelectedJob(res.data);
         } catch (error) {
             console.error("Failed to load job details", error);

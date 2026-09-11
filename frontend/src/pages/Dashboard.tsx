@@ -10,7 +10,7 @@ import api from '../api';
 
 const fetchUserAnalytics = async () => {
     try {
-        const { data } = await api.get('http://localhost:8000/dashboard/user-analytics');
+        const { data } = await api.get('/dashboard/user-analytics');
         // Map the real backend response back into the frontend schema to avoid breaking UI layouts
         return {
             total_applications: data.analytics.applications_submitted || 0,

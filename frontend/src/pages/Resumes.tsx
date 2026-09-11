@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { UploadCloud, FileText, Trash2, Download, Eye } from 'lucide-react';
-import api from '../api';
+import api, { API_BASE_URL } from '../api';
 
 const Resumes = () => {
     const [file, setFile] = useState<File | null>(null);
@@ -51,7 +51,6 @@ const Resumes = () => {
 
         try {
             const res = await api.post('/resume/upload', formData, {
-                baseURL: 'http://localhost:8000',
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 }
@@ -67,7 +66,7 @@ const Resumes = () => {
 
     const handleDelete = async () => {
         try {
-            await api.delete('/resume/', { baseURL: 'http://localhost:8000' });
+            await api.delete('/resume/');
             setActiveResumeUrl(null);
         } catch (error) {
             console.error("Delete failed");
@@ -153,7 +152,7 @@ const Resumes = () => {
                                 <button style={{ flex: 1, background: 'transparent', border: 'none', color: 'var(--text-light)', padding: '0.75rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', gap: '0.5rem', alignItems: 'center' }}>
                                     <Eye size={16} /> Preview
                                 </button>
-                                <a href={`http://localhost:8000/resume/download`} target="_blank" rel="noreferrer" style={{ flex: 1, textDecoration: 'none', background: 'transparent', border: 'none', color: 'var(--text-light)', padding: '0.75rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', gap: '0.5rem', alignItems: 'center', borderLeft: '1px solid var(--border-color)' }}>
+                                <a href={`${API_BASE_URL}/resume/download`} target="_blank" rel="noreferrer" style={{ flex: 1, textDecoration: 'none', background: 'transparent', border: 'none', color: 'var(--text-light)', padding: '0.75rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', gap: '0.5rem', alignItems: 'center', borderLeft: '1px solid var(--border-color)' }}>
                                     <Download size={16} /> Download
                                 </a>
                                 <button onClick={handleDelete} style={{ flex: 1, background: 'transparent', border: 'none', color: 'var(--danger)', padding: '0.75rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', gap: '0.5rem', alignItems: 'center', borderLeft: '1px solid var(--border-color)' }}>

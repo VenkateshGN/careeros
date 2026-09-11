@@ -23,8 +23,6 @@ const JobMatching = () => {
             const res = await api.post('/ai/job-matching', {
                 resume_text: resumeText,
                 job_description: jobDescription
-            }, {
-                baseURL: 'http://localhost:8000'
             });
             setResult(res.data);
         } catch (error: any) {

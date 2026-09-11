@@ -15,8 +15,8 @@ const AgentChat = () => {
         setLoading(true);
 
         try {
-            console.log("Outgoing AI Chat Request URL: http://localhost:8000/ai/agent/chat", { message: userText });
-            const { data } = await api.post('http://localhost:8000/ai/agent/chat', {
+            console.log("Outgoing AI Chat Request URL:", { message: userText });
+            const { data } = await api.post('/ai/agent/chat', {
                 message: userText
             });
             setMessages(prev => [...prev, { role: 'agent', text: data.reply }]);

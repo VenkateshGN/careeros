@@ -23,8 +23,6 @@ const CareerCoach = () => {
             const res = await api.post('/ai/career-roadmap', {
                 current_role: currentRole,
                 target_role: targetRole
-            }, {
-                baseURL: 'http://localhost:8000'
             });
             setResult(res.data);
         } catch (error: any) {

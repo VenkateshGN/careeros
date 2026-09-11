@@ -20,7 +20,7 @@ const RecruiterDashboard = () => {
     useEffect(() => {
         const fetchRecruiterJobs = async () => {
             try {
-                const res = await api.get('/jobs/', { baseURL: 'http://localhost:8000' });
+                const res = await api.get('/jobs/');
                 setJobs(res.data);
             } catch (err) {
                 console.error("Failed fetching jobs", err);
@@ -34,10 +34,10 @@ const RecruiterDashboard = () => {
         try {
             // Hardcode a mock company_id uuid to bypass strict constraints for now
             const mockCompanyId = '00000000-0000-0000-0000-000000000000';
-            await api.post('/jobs/', { ...newJob, company_id: mockCompanyId }, { baseURL: 'http://localhost:8000', headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+            await api.post('/jobs/', { ...newJob, company_id: mockCompanyId }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
             setShowPostJob(false);
             // Refresh
-            const res = await api.get('/jobs/', { baseURL: 'http://localhost:8000' });
+            const res = await api.get('/jobs/');
             setJobs(res.data);
         } catch (error) {
             console.error("Failed to post job");

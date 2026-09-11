@@ -21,7 +21,7 @@ const Profile = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await api.get('/users/me', { baseURL: 'http://localhost:8000' });
+                const res = await api.get('/users/me');
                 const data = res.data;
                 setFormData({
                     name: data.full_name || '',
@@ -59,7 +59,7 @@ const Profile = () => {
                 linkedin_url: parseUrl(formData.linkedin)
             };
 
-            const res = await api.put('/users/me', payload, { baseURL: 'http://localhost:8000' });
+            const res = await api.put('/users/me', payload);
             setUser({ ...user, name: res.data.full_name, email: res.data.email });
             toast.success("Profile updated successfully!");
         } catch (error) {

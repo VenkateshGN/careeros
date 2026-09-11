@@ -18,8 +18,6 @@ const CoverLetters = () => {
                 company_name: companyName,
                 job_title: jobTitle,
                 tone: tone
-            }, {
-                baseURL: 'http://localhost:8000'
             });
             setContent(res.data.content);
         } catch (error) {
